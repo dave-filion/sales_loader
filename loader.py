@@ -6,19 +6,21 @@ import argparse
 
 TABLE_NAME = "transactions"
 
-def connect_to_db():
-    conn = psycopg2.connect(dbname="df", user="df", host="localhost")
+def connect_to_db(database, user):
+    conn = psycopg2.connect(dbname=database, user=user, host="localhost")
     conn.autocommit = True
     return conn.cursor()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="load data into database")
     parser.add_argument("-f", "--file", type=str, help="file to upload")
+    parser.add_argument("-d", "--database", type=str, help="name of database in postgres")
+    parser.add_argument("-u", "--user", type=str, help="name of database user")
     return parser.parse_args()
 
 def main(args):
     with open(args.file, 'rU') as csvfile:
-        pg = connect_to_db()
+        pg = connect_to_db(args.database, args.user)
 
         print "Truncating transactions table"
         truncate_sql = """
